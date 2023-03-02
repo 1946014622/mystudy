@@ -1,0 +1,8 @@
+spring:
+  profiles:
+    group:
+      mygroup[0]: test
+      mygroup[1]: pro
+    active: mygroup
+server:
+  port: 5555
