@@ -1,0 +1,7 @@
+# Project exclude paths
+/aop_study/target/
+/jdbc_template_study/target/
+/out/
+/spring_study/target/
+/springboot_study/target/
+/springmvc_study/target/
