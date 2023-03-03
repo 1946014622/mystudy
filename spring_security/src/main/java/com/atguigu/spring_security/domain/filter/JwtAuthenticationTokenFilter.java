@@ -18,27 +18,27 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-//@Component
-//public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
-//    @Resource
-//    private RedisTemplate redisTemplate;
-//    @SneakyThrows
-//    @Override
-//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
-//        String token = request.getHeader("token");
-//        if (!StringUtils.hasLength(token)) {
-//            filterChain.doFilter(request,response);
-//            return;
-//        }
-//        Claims claims = JwtUtil.parseJWT(token);
-//        String subject = claims.getSubject();
-//        LoginUser loginUser = (LoginUser) redisTemplate.opsForValue().get(subject);
-//        if (ObjectUtils.isEmpty(loginUser)) {
-//            throw new RuntimeException("用户未登录");
-//        }
-//        UsernamePasswordAuthenticationToken authenticationToken
-//                = new UsernamePasswordAuthenticationToken(loginUser,null,null);
-//        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-//        filterChain.doFilter(request,response);
-//    }
-//}
+@Component
+public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
+    @Resource
+    private RedisTemplate redisTemplate;
+    @SneakyThrows
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
+        String token = request.getHeader("token");
+        if (!StringUtils.hasLength(token)) {
+            filterChain.doFilter(request,response);
+            return;
+        }
+        Claims claims = JwtUtil.parseJWT(token);
+        String subject = claims.getSubject();
+        LoginUser loginUser = (LoginUser) redisTemplate.opsForValue().get(subject);
+        if (ObjectUtils.isEmpty(loginUser)) {
+            throw new RuntimeException("用户未登录");
+        }
+        UsernamePasswordAuthenticationToken authenticationToken
+                = new UsernamePasswordAuthenticationToken(loginUser,null,loginUser.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        filterChain.doFilter(request,response);
+    }
+}

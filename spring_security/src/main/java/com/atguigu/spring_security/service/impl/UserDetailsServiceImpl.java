@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @Log4j2
@@ -25,7 +27,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             log.error("账号或者密码错误");
             return null;
         }
-        return new LoginUser(sysUser);
+        List<String> permissions = new ArrayList<>();
+        permissions.add("ROLE_vip");
+        return new LoginUser(sysUser,permissions);
     }
 
 }

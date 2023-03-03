@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -61,9 +62,19 @@ public class UserServiceImpl implements UserService {
      * 用户注册
      */
     @Override
-    public Response register(SysUser sysUser) {
+    public Response<Object> register(SysUser sysUser) {
         Assert.notNull(sysUser,"用户信息不能为空");
-        String encode = bCryptPasswordEncoder.encode(sysUser.getPassword());
+        boolean b = sysUserMapper.queryByUserName(sysUser.getUserName())!=null;
+        if (b) {
+            return new Response<>(500,"当前用户名已经存在，请重新输入");
+        }
+        String specification = "^\\w{8,15}$";
+        String password = sysUser.getPassword();
+        boolean matches = password.matches(specification);
+        if (!matches) {
+            return new Response<>(500,"密码需要满足8-15位的字符以及数字");
+        }
+        String encode = bCryptPasswordEncoder.encode(password);
         sysUser.setPassword(encode);
         sysUser.setCreateTime(new Date());
         boolean insert = sysUserMapper.insert(sysUser) > 0;
@@ -71,5 +82,17 @@ public class UserServiceImpl implements UserService {
             return new Response<>(200,"注册成功");
         }
         return new Response<>(500,"注册失败");
+    }
+
+    /**
+     * 退出登录
+     */
+    @Override
+    public Response.success<Object> exit(Long userId) {
+        Boolean delete = redisTemplate.delete(userId.toString());
+        if (Boolean.TRUE.equals(delete)) {
+            return Response.success("退出成功");
+        }
+        return Response.success("退出失败");
     }
 }

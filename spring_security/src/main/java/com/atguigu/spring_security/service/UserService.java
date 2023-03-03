@@ -10,5 +10,7 @@ public interface UserService {
 
     Response<Map<String,String>> login(SysUser sysUser);
 
-    Response register(SysUser sysUser);
+    Response<Object> register(SysUser sysUser);
+
+    Response.success<Object> exit(Long userId);
 }
